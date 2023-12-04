@@ -146,8 +146,9 @@ print("ls:", os.listdir())
 
 # Run e2e tests
 if args.skipPluginUpload:
-    os.chdir("plugin")
-    run_shell_command("mvn -amd -pl '!cdap-ui' dependency:purge-local-repository -DmanualInclude=io.cdap.tests.e2e:cdap-e2e-framework")
+    print("Skipping everything")
+    # os.chdir("plugin")
+    # run_shell_command("mvn -amd -pl '!cdap-ui' dependency:purge-local-repository -DmanualInclude=io.cdap.tests.e2e:cdap-e2e-framework")
 
 else:
     if args.framework:
