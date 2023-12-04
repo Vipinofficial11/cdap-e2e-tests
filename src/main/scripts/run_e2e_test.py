@@ -145,20 +145,14 @@ print("cwd:", os.getcwd())
 print("ls:", os.listdir())
 
 # Run e2e tests
-if args.skipPluginUpload:
-    print("Skipping everything")
-    # os.chdir("plugin")
-    # run_shell_command("mvn -amd -pl '!cdap-ui' dependency:purge-local-repository -DmanualInclude=io.cdap.tests.e2e:cdap-e2e-framework")
-
+if args.framework:
+    print("Preparing e2e framework")
+    os.chdir("e2e")
+    run_shell_command("mvn clean install")
+    os.chdir("../plugin")
 else:
-    if args.framework:
-        print("Preparing e2e framework")
-        os.chdir("e2e")
-        run_shell_command("mvn clean install")
-        os.chdir("../plugin")
-    else:
-        os.chdir("plugin")
-        run_shell_command("mvn dependency:purge-local-repository -DmanualInclude=io.cdap.tests.e2e:cdap-e2e-framework")
+    os.chdir("plugin")
+    run_shell_command("mvn dependency:purge-local-repository -DmanualInclude=io.cdap.tests.e2e:cdap-e2e-framework")
 
 print("Running e2e integration tests")
 
