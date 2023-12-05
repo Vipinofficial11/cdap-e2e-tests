@@ -81,11 +81,15 @@ if args.module:
     module_to_build = args.module
 
 
-#Building Framework
-os.chdir("../../../e2e")
-print("Preparing e2e framework")
-run_shell_command("mvn clean install")
-os.chdir("../plugin")
+# if args.framework:
+#     print("Preparing e2e framework")
+#     os.chdir("e2e")
+#     run_shell_command("mvn clean install")
+#     os.chdir("../plugin")
+# else:
+#     os.chdir("plugin")
+#     run_shell_command("mvn dependency:purge-local-repository -DmanualInclude=io.cdap.tests.e2e:cdap-e2e-framework")
+
 
 # Run e2e tests
 print("Running e2e integration tests")
