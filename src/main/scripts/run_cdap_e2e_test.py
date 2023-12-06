@@ -76,28 +76,12 @@ for plugin, details in plugin_details['plugins'].items():
     artifact_version = details.get('artifact_version')
     subprocess.run(["python3.9", os.path.join('e2e', 'src', 'main', 'scripts', 'upload_required_plugins.py'), artifact_name, artifact_version])
 
-module_to_build = ""
-if args.module:
-    module_to_build = args.module
-
-
-# if args.framework:
-#     print("Preparing e2e framework")
-#     os.chdir("e2e")
-#     run_shell_command("mvn clean install")
-#     os.chdir("../plugin")
-# else:
-#     os.chdir("plugin")
-#     run_shell_command("mvn dependency:purge-local-repository -DmanualInclude=io.cdap.tests.e2e:cdap-e2e-framework")
-
 
 # Run e2e tests
-print("Running e2e integration tests")
+print("Running e2e integration tests for cdap")
 assertion_error = None
 try:
-    print("Updated Working Directory:", os.getcwd())
     os.chdir("./plugin/cdap-e2e-tests")
-    print("Updated Working Directory:", os.getcwd())
     run_shell_command(f"mvn verify -P e2e-tests")
 except AssertionError as e:
     assertion_error = e
@@ -106,7 +90,7 @@ finally:
 
 cwd = os.getcwd()
 print("Copying sandbox logs to e2e-debug")
-shutil.copytree(cwd+"/sandbox/"+sandbox_dir+"/data/logs", cwd+"/plugin/target/e2e-debug/sandbox/data/logs")
-shutil.copytree(cwd+"/sandbox/"+sandbox_dir+"/logs", cwd+"/plugin/target/e2e-debug/sandbox/logs")
+shutil.copytree(cwd+"/sandbox/"+sandbox_dir+"/data/logs", cwd+"/plugin/target/cdap-e2e-tests/e2e-debug/sandbox/data/logs")
+shutil.copytree(cwd+"/sandbox/"+sandbox_dir+"/logs", cwd+"/plugin/cdap-e2e-tests/target/e2e-debug/sandbox/logs")
 if assertion_error != None:
     raise assertion_error
