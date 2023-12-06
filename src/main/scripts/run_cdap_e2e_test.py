@@ -13,14 +13,11 @@
 # the License.
 
 import io
-import json
 import os
 import requests
 import subprocess
-import xml.etree.ElementTree as ET
 import zipfile
 import shutil
-import sys
 import argparse
 import urllib.request
 import yaml
@@ -34,11 +31,6 @@ def run_shell_command(cmd):
 # Parse command line optional arguments
 parser=argparse.ArgumentParser()
 parser.add_argument('--testRunner', help='TestRunner class to execute tests')
-parser.add_argument('--module', help='Module for which tests need to be run')
-parser.add_argument('--framework', help='Pass this param if workflow is triggered from e2e framework repo')
-parser.add_argument('--mvnTestRunProfiles', help='Maven build profiles to run the e2e tests')
-parser.add_argument('--mvnProjectBuildProfiles', help='Maven project build profiles')
-parser.add_argument('--skipPluginUpload', help='Pass this param if plugin upload needs to be skipped')
 args=parser.parse_args()
 
 # Start CDAP sandbox
@@ -79,10 +71,19 @@ for plugin, details in plugin_details['plugins'].items():
 
 # Run e2e tests
 print("Running e2e integration tests for cdap")
+
+testrunner_to_run = ""
+if args.testRunner:
+    testrunner_to_run = args.testRunner
+
 assertion_error = None
 try:
     os.chdir("./plugin/cdap-e2e-tests")
-    run_shell_command(f"mvn verify -P e2e-tests")
+    if testrunner_to_run:
+        print("TestRunner to run : " + testrunner_to_run)
+        run_shell_command(f"mvn verify -P e2e-tests -DTEST_RUNNER={testrunner_to_run}")
+    else:
+        run_shell_command(f"mvn verify -P e2e-test")
 except AssertionError as e:
     assertion_error = e
 finally:
