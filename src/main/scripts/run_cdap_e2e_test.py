@@ -96,7 +96,7 @@ print("Running e2e integration tests")
 assertion_error = None
 try:
     print("Updated Working Directory:", os.getcwd())
-    os.chdir("cdap-e2e-tests")
+    os.chdir("./cdap-e2e-tests")
     run_shell_command(f"mvn verify -P e2e-tests")
 except AssertionError as e:
     assertion_error = e
