@@ -34,27 +34,45 @@ parser.add_argument('--testRunner', help='TestRunner class to execute tests')
 args=parser.parse_args()
 
 # Start CDAP sandbox
-print("Downloading CDAP sandbox")
-sandbox_url = "https://github.com/cdapio/cdap-build/releases/download/latest/cdap-sandbox-6.11.0-SNAPSHOT.zip"
-sandbox_dir = sandbox_url.split("/")[-1].split(".zip")[0]
-r = requests.get(sandbox_url)
-z = zipfile.ZipFile(io.BytesIO(r.content))
-z.extractall("./sandbox")
+# print("Downloading CDAP sandbox")
+# sandbox_url = "https://github.com/cdapio/cdap-build/releases/download/latest/cdap-sandbox-6.11.0-SNAPSHOT.zip"
+# sandbox_dir = sandbox_url.split("/")[-1].split(".zip")[0]
+# r = requests.get(sandbox_url)
+# z = zipfile.ZipFile(io.BytesIO(r.content))
+# z.extractall("./sandbox")
 
-print("Installing gcs connector jar")
-gcs_jar_url = "https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop2-2.2.16.jar"
-gcs_jar_fname = f"sandbox/{sandbox_dir}/lib/gcs-connector-hadoop2-2.2.9.jar"
-urllib.request.urlretrieve(gcs_jar_url, gcs_jar_fname)
-
-print("Start the sandbox")
-run_shell_command(f"chmod +x sandbox/{sandbox_dir}/bin/cdap")
+print("Building CDAP Sandbox")
+run_shell_command("git clone https://github.com/cdapio/hydrator-plugins.git")
+run_shell_command("cd cdap")
+run_shell_command("git submodule update --init --recursive --remote")
+run_shell_command("mvn clean install -DskipTests")
+run_shell_command('MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=128m" mvn clean package -pl cdap-standalone,' \
+                  'cdap-app-templates/cdap-etl -am -amd -DskipTests -P templates,dist,release,unit-tests')
+run_shell_command("cd cdap-standalone/target")
+run_shell_command("unzip cdap-sandbox-6.11.0-SNAPSHOT.zip")
+run_shell_command("cd cdap-sandbox-6.11.0-SNAPSHOT")
+run_shell_command("cd bin")
+print("COMPLETED TILL BUILDING THE ZIP FILE FOR SANDBOX")
 my_env = os.environ.copy()
 my_env["_JAVA_OPTIONS"] = "-Xmx32G"
-sandbox_start_cmd = "sandbox/" + sandbox_dir + "/bin/cdap sandbox restart"
-process = subprocess.Popen(sandbox_start_cmd, shell=True, env=my_env)
+process = subprocess.Popen("./cdap sandbox start", shell=True, env=my_env)
 process.communicate()
 assert process.returncode == 0
 
+# print("Installing gcs connector jar")
+# gcs_jar_url = "https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop2-2.2.16.jar"
+# gcs_jar_fname = f"sandbox/{sandbox_dir}/lib/gcs-connector-hadoop2-2.2.9.jar"
+# urllib.request.urlretrieve(gcs_jar_url, gcs_jar_fname)
+#
+# print("Start the sandbox")
+# run_shell_command(f"chmod +x sandbox/{sandbox_dir}/bin/cdap")
+# my_env = os.environ.copy()
+# my_env["_JAVA_OPTIONS"] = "-Xmx32G"
+# sandbox_start_cmd = "sandbox/" + sandbox_dir + "/bin/cdap sandbox restart"
+# process = subprocess.Popen(sandbox_start_cmd, shell=True, env=my_env)
+# process.communicate()
+# assert process.returncode == 0
+#
 # Setting the task executor memory
 res = requests.put('http://localhost:11015/v3/preferences', headers= {'Content-Type': 'application/json'}, json={'task.executor.system.resources.memory': 4096})
 assert res.ok or print(res.text)
