@@ -48,14 +48,15 @@ os.chdir("./plugin")
 print("after - cwd:", os.getcwd())
 run_shell_command("git submodule update --init --recursive --remote")
 run_shell_command("mvn clean install -DskipTests")
-run_shell_command('MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=128m" mvn clean package -pl cdap-standalone,' \
-                  'cdap-app-templates/cdap-etl -am -amd -DskipTests -P templates,dist,release,unit-tests')
+my_env = os.environ.copy()
+my_env["MAVEN_OPTS"] = "-Xmx1024m -XX:MaxPermSize=128m"
+run_shell_command('mvn clean package -pl cdap-standalone,cdap-app-templates/cdap-etl -am -amd -DskipTests -P '
+                  'templates,dist,release,unit-tests')
 os.chdir("./cdap-standalone/target")
 run_shell_command("unzip cdap-sandbox-6.11.0-SNAPSHOT.zip")
 os.chdir("./cdap-sandbox-6.11.0-SNAPSHOT/bin")
 
 print("COMPLETED TILL BUILDING THE ZIP FILE FOR SANDBOX")
-my_env = os.environ.copy()
 my_env["_JAVA_OPTIONS"] = "-Xmx32G"
 process = subprocess.Popen("./cdap sandbox start", shell=True, env=my_env)
 process.communicate()
