@@ -42,10 +42,7 @@ args=parser.parse_args()
 # z.extractall("./sandbox")
 
 print("Building CDAP Sandbox")
-# run_shell_command("git clone https://github.com/cdapio/hydrator-plugins.git")
-print("before - cwd:", os.getcwd())
 os.chdir("./plugin")
-print("after - cwd:", os.getcwd())
 run_shell_command("git submodule update --init --recursive --remote")
 run_shell_command("mvn clean install -DskipTests")
 my_env = os.environ.copy()
@@ -53,7 +50,12 @@ my_env["MAVEN_OPTS"] = "-Xmx1024m -XX:MaxPermSize=128m"
 run_shell_command('mvn clean package -pl cdap-standalone,cdap-app-templates/cdap-etl -am -amd -DskipTests -P '
                   'templates,dist,release,unit-tests')
 os.chdir("./cdap-standalone/target")
-subprocess.run("unzip cdap-sandbox-6.11.0-SNAPSHOT.zip")
+
+sandbox = "cdap-sandbox-6.11.0-SNAPSHOT.zip"
+print("cwd before extracting :", os.getcwd())
+with zipfile.ZipFile(sandbox, 'r') as z:
+    z.extractall(os.getcwd())
+
 os.chdir("./cdap-sandbox-6.11.0-SNAPSHOT/bin")
 
 print("COMPLETED TILL BUILDING THE ZIP FILE FOR SANDBOX")
