@@ -53,7 +53,7 @@ my_env["MAVEN_OPTS"] = "-Xmx1024m -XX:MaxPermSize=128m"
 run_shell_command('mvn clean package -pl cdap-standalone,cdap-app-templates/cdap-etl -am -amd -DskipTests -P '
                   'templates,dist,release,unit-tests')
 os.chdir("./cdap-standalone/target")
-run_shell_command("unzip cdap-sandbox-6.11.0-SNAPSHOT.zip")
+subprocess.run("unzip cdap-sandbox-6.11.0-SNAPSHOT.zip")
 os.chdir("./cdap-sandbox-6.11.0-SNAPSHOT/bin")
 
 print("COMPLETED TILL BUILDING THE ZIP FILE FOR SANDBOX")
