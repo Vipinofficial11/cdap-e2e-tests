@@ -33,15 +33,8 @@ parser=argparse.ArgumentParser()
 parser.add_argument('--testRunner', help='TestRunner class to execute tests')
 args=parser.parse_args()
 
-# Start CDAP sandbox
-# print("Downloading CDAP sandbox")
-# sandbox_url = "https://github.com/cdapio/cdap-build/releases/download/latest/cdap-sandbox-6.11.0-SNAPSHOT.zip"
-# sandbox_dir = sandbox_url.split("/")[-1].split(".zip")[0]
-# r = requests.get(sandbox_url)
-# z = zipfile.ZipFile(io.BytesIO(r.content))
-# z.extractall("./sandbox")
-
 print("Building CDAP Sandbox")
+
 os.chdir("./plugin")
 run_shell_command("git submodule update --init --recursive --remote")
 run_shell_command("mvn clean install -DskipTests")
@@ -56,11 +49,13 @@ print("cwd before extracting :", os.getcwd())
 with zipfile.ZipFile(sandbox, 'r') as z:
     z.extractall(os.getcwd())
 
-os.chdir("./cdap-sandbox-6.11.0-SNAPSHOT/bin")
-
 print("COMPLETED TILL BUILDING THE ZIP FILE FOR SANDBOX")
+
+run_shell_command("chmod +x cdap-sandbox-6.11.0-SNAPSHOT/bin/cdap")
+my_env = os.environ.copy()
 my_env["_JAVA_OPTIONS"] = "-Xmx32G"
-process = subprocess.Popen("./cdap sandbox start", shell=True, env=my_env)
+sandbox_start_cmd = "cdap-sandbox-6.11.0-SNAPSHOT/bin/cdap sandbox restart"
+process = subprocess.Popen(f"chmod +x {sandbox_start_cmd}", shell=True, env=my_env)
 process.communicate()
 assert process.returncode == 0
 
@@ -78,19 +73,6 @@ assert process.returncode == 0
 # process.communicate()
 # assert process.returncode == 0
 #
-# Setting the task executor memory
-res = requests.put('http://localhost:11015/v3/preferences', headers= {'Content-Type': 'application/json'}, json={'task.executor.system.resources.memory': 4096})
-assert res.ok or print(res.text)
-
-# Upload required plugins from CDAP Hub
-plugin_details_file = open(os.path.join('e2e', 'src', 'main', 'scripts', 'required_plugins.yaml'))
-plugin_details = yaml.load(plugin_details_file, Loader=yaml.FullLoader)
-
-for plugin, details in plugin_details['plugins'].items():
-    artifact_name = details.get('artifact_name')
-    artifact_version = details.get('artifact_version')
-    subprocess.run(["python3.9", os.path.join('e2e', 'src', 'main', 'scripts', 'upload_required_plugins.py'), artifact_name, artifact_version])
-
 
 # Run e2e tests
 print("Running e2e integration tests for cdap")
