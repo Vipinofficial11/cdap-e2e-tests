@@ -55,7 +55,7 @@ run_shell_command("chmod +x cdap-sandbox-6.11.0-SNAPSHOT/bin/cdap")
 my_env = os.environ.copy()
 my_env["_JAVA_OPTIONS"] = "-Xmx32G"
 sandbox_start_cmd = "cdap-sandbox-6.11.0-SNAPSHOT/bin/cdap sandbox restart"
-process = subprocess.Popen(f"chmod +x {sandbox_start_cmd}", shell=True, env=my_env)
+process = subprocess.Popen(f"{sandbox_start_cmd}", shell=True, env=my_env)
 process.communicate()
 assert process.returncode == 0
 
