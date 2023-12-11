@@ -34,27 +34,35 @@ parser.add_argument('--testRunner', help='TestRunner class to execute tests')
 args=parser.parse_args()
 
 print("Building CDAP Sandbox")
-
 os.chdir("./plugin")
 run_shell_command("git submodule update --init --recursive --remote")
-run_shell_command("mvn clean install -DskipTests")
+run_shell_command("mvn clean install -DskipTests -P templates,spark-dev")
 my_env = os.environ.copy()
 my_env["MAVEN_OPTS"] = "-Xmx1024m -XX:MaxPermSize=128m"
-run_shell_command('mvn clean package -pl cdap-standalone,cdap-app-templates/cdap-etl -am -amd -DskipTests -P '
-                  'templates,dist,release,unit-tests')
+my_env["_JAVA_OPTIONS"] = "-Xmx32G"
+
+#Building the plugins
+hydrator_repository_url = "https://github.com/cdapio/hydrator-plugins.git"
+subprocess.run(["git", "clone", hydrator_repository_url])
+os.chdir("./hydrator-plugins")
+run_shell_command("git submodule update --init --recursive --remote")
+run_shell_command("mvn clean install -DskipTests")
+os.chdir("..")
+
+my_env["HYDRATOR_PLUGINS"] = "./hydrator-plugins"
+#Building the sandbox
+run_shell_command(f'mvn clean package -pl cdap-standalone,cdap-app-templates/cdap-etl -am -amd -DskipTests -P '
+                  f'templates,dist,release,unit-tests,-Dadditional.artifacts.dir=${{HYDRATOR_PLUGINS}}')
 os.chdir("./cdap-standalone/target")
 
-sandbox = "cdap-sandbox-6.11.0-SNAPSHOT.zip"
+sandbox_zip = "cdap-sandbox-6.11.0-SNAPSHOT.zip"
 print("cwd before extracting :", os.getcwd())
-with zipfile.ZipFile(sandbox, 'r') as z:
+with zipfile.ZipFile(sandbox_zip, 'r') as z:
     z.extractall(os.getcwd())
 
-print("COMPLETED TILL BUILDING THE ZIP FILE FOR SANDBOX")
-
-run_shell_command("chmod +x cdap-sandbox-6.11.0-SNAPSHOT/bin/cdap")
-my_env = os.environ.copy()
-my_env["_JAVA_OPTIONS"] = "-Xmx32G"
-sandbox_start_cmd = "cdap-sandbox-6.11.0-SNAPSHOT/bin/cdap sandbox restart"
+sandbox_dir = sandbox_zip.replace(".zip", "")
+run_shell_command(f"chmod +x {sandbox_dir}/bin/cdap")
+sandbox_start_cmd = f"{sandbox_dir}/bin/cdap sandbox restart"
 process = subprocess.Popen(f"{sandbox_start_cmd}", shell=True, env=my_env)
 process.communicate()
 assert process.returncode == 0
