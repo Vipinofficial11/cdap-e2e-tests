@@ -59,28 +59,13 @@ process = subprocess.Popen(f"{sandbox_start_cmd}", shell=True, env=my_env)
 process.communicate()
 assert process.returncode == 0
 
-# print("Installing gcs connector jar")
-# gcs_jar_url = "https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop2-2.2.16.jar"
-# gcs_jar_fname = f"sandbox/{sandbox_dir}/lib/gcs-connector-hadoop2-2.2.9.jar"
-# urllib.request.urlretrieve(gcs_jar_url, gcs_jar_fname)
-#
-# print("Start the sandbox")
-# run_shell_command(f"chmod +x sandbox/{sandbox_dir}/bin/cdap")
-# my_env = os.environ.copy()
-# my_env["_JAVA_OPTIONS"] = "-Xmx32G"
-# sandbox_start_cmd = "sandbox/" + sandbox_dir + "/bin/cdap sandbox restart"
-# process = subprocess.Popen(sandbox_start_cmd, shell=True, env=my_env)
-# process.communicate()
-# assert process.returncode == 0
-#
-
 # Run e2e tests
 print("Running e2e integration tests for cdap")
 
 testrunner_to_run = ""
 if args.testRunner:
     testrunner_to_run = args.testRunner
-
+os.chdir("../../..")
 assertion_error = None
 try:
     os.chdir("./plugin/cdap-e2e-tests")
