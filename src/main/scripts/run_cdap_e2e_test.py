@@ -40,21 +40,22 @@ run_shell_command("mvn clean install -DskipTests -P templates,spark-dev")
 my_env = os.environ.copy()
 my_env["MAVEN_OPTS"] = "-Xmx1024m -XX:MaxPermSize=128m"
 my_env["_JAVA_OPTIONS"] = "-Xmx32G"
-my_env["HYDRATOR_PLUGINS"] = "./hydrator-plugins"
+my_env["HYDRATOR_PLUGINS"] = "../hydrator-plugins"
 
 #Building the plugins
+os.chdir("..")
 hydrator_repository_url = "https://github.com/cdapio/hydrator-plugins.git"
 subprocess.run(["git", "clone", hydrator_repository_url])
 os.chdir("./hydrator-plugins")
 run_shell_command("git submodule update --init --recursive --remote")
 run_shell_command("mvn clean install -DskipTests")
-os.chdir("..")
+os.chdir("./plugin")
 
 
 print(os.environ)
 #Building the sandbox
 run_shell_command('mvn clean package -pl cdap-standalone,cdap-app-templates/cdap-etl -am -amd -DskipTests -P '
-                  f'templates,dist,release,unit-tests -Dadditional.artifacts.dir=./hydrator-plugins')
+                  f'templates,dist,release,unit-tests -Dadditional.artifacts.dir=../hydrator-plugins')
 os.chdir("./cdap-standalone/target")
 sandbox_zip = "cdap-sandbox-6.11.0-SNAPSHOT.zip"
 print("cwd before extracting :", os.getcwd())
