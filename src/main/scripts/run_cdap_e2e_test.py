@@ -49,7 +49,7 @@ subprocess.run(["git", "clone", hydrator_repository_url])
 os.chdir("./hydrator-plugins")
 run_shell_command("git submodule update --init --recursive --remote")
 run_shell_command("mvn clean install -DskipTests")
-os.chdir("./plugin")
+os.chdir("../plugin")
 
 
 print(os.environ)
