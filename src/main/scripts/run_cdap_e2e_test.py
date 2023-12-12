@@ -55,7 +55,7 @@ os.chdir("../plugin")
 print(os.environ)
 #Building the sandbox
 run_shell_command('mvn clean package -pl cdap-standalone,cdap-app-templates/cdap-etl -am -amd -DskipTests -P '
-                  f'templates,dist,release,unit-tests -Dadditional.artifacts.dir=../hydrator-plugins')
+                  f'templates,dist,release,unit-tests -Dadditional.artifacts.dir=../../hydrator-plugins/')
 os.chdir("./cdap-standalone/target")
 sandbox_zip = "cdap-sandbox-6.11.0-SNAPSHOT.zip"
 print("cwd before extracting :", os.getcwd())
