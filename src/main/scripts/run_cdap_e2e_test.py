@@ -37,8 +37,7 @@ def get_sandbox_version(directory_path):
     for entry in os.listdir(directory_path):
         entry_path = os.path.join(directory_path, entry)
 
-        # Check if it's a directory and matches the pattern
-        if os.path.isdir(entry_path) and pattern.match(entry):
+        if pattern.match(entry):
             version_match = pattern.search(entry)
             if version_match:
                 version = version_match.group(1)
