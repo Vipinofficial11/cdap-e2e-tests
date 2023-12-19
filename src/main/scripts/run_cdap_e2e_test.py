@@ -22,6 +22,7 @@ import argparse
 import urllib.request
 import yaml
 import re
+import configparser
 
 
 def run_shell_command(cmd):
@@ -45,6 +46,18 @@ def get_sandbox_version(directory_path):
 
 
 
+def get_hydrator_branch(gitmodules_path, submodule_path):
+    config = configparser.ConfigParser()
+    config.read(gitmodules_path)
+
+    # Check if the submodule exists in the .gitmodules file
+    if config.has_section(f"submodule \"{submodule_path}\""):
+        branch = config.get(f"submodule \"{submodule_path}\"", "branch")
+        return branch
+    else:
+        return None
+
+
 # Parse command line optional arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('--testRunner', help='TestRunner class to execute tests')
@@ -61,8 +74,25 @@ my_env["HYDRATOR_PLUGINS"] = "../hydrator-plugins"
 
 # Building the plugins
 os.chdir("..")
+# Create a logic to clone cdap-build repo based on cdap branch and then from cdap-build repo get hydrator branch
+cdap_build_branch = "develop"
+cdap_build_repository_url = "https://github.com/cdapio/cdap-build.git"
+subprocess.run(["git", "clone", "-b", cdap_build_branch, cdap_build_repository_url])
+
+# .gitmodules file path and hydrator submodule path.
+gitmodules_path = "./cdap-build/.gitmodules"
+submodule_path = "app-artifacts/hydrator-plugins"
+branch = get_hydrator_branch(gitmodules_path, submodule_path)
+
+if branch is not None:
+    print(f"The branch of submodule '{submodule_path}' is: {branch}")
+else:
+    print(f"Submodule '{submodule_path}' not found in .gitmodules file.")
+
+
+hydrator_repository_branch = branch
 hydrator_repository_url = "https://github.com/cdapio/hydrator-plugins.git"
-subprocess.run(["git", "clone", hydrator_repository_url])
+subprocess.run(["git", "clone", "-b", hydrator_repository_branch, hydrator_repository_url])
 os.chdir("./hydrator-plugins")
 run_shell_command("git submodule update --init --recursive --remote")
 run_shell_command("mvn clean install -DskipTests")
