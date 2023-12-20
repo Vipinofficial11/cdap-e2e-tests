@@ -45,7 +45,6 @@ def get_sandbox_version(directory_path):
                 return version
 
 
-
 def get_hydrator_branch(gitmodules_path, submodule_path):
     config = configparser.ConfigParser()
     config.read(gitmodules_path)
@@ -75,7 +74,9 @@ my_env["HYDRATOR_PLUGINS"] = "../hydrator-plugins"
 # Building the plugins
 os.chdir("..")
 # Create a logic to clone cdap-build repo based on cdap branch and then from cdap-build repo get hydrator branch
-cdap_build_branch = "develop"
+cdap_branch = os.environ.get('PR_BRANCH', 'default_branch_if_not_available')
+print("CDAP BRANCH against which PR is raised: ", cdap_branch)
+cdap_build_branch = cdap_branch
 cdap_build_repository_url = "https://github.com/cdapio/cdap-build.git"
 subprocess.run(["git", "clone", "-b", cdap_build_branch, cdap_build_repository_url])
 
@@ -88,7 +89,6 @@ if branch is not None:
     print(f"The branch of submodule '{submodule_path}' is: {branch}")
 else:
     print(f"Submodule '{submodule_path}' not found in .gitmodules file.")
-
 
 hydrator_repository_branch = branch
 hydrator_repository_url = "https://github.com/cdapio/hydrator-plugins.git"
