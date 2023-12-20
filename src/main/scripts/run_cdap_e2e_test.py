@@ -75,7 +75,8 @@ my_env["HYDRATOR_PLUGINS"] = "../hydrator-plugins"
 # Building the plugins
 os.chdir("..")
 # Create a logic to clone cdap-build repo based on cdap branch and then from cdap-build repo get hydrator branch
-cdap_branch = "release"
+cdap_branch = ""
+print(args.cdapBranch)
 if args.cdapBranch:
     cdap_branch = args.cdapBranch
 print("CDAP BRANCH against which PR is raised: ", cdap_branch)
