@@ -39,3 +39,8 @@ modules:
     driver_prop: '[{"name":"mysql","type":"jdbc","className":"com.mysql.jdbc.Driver","description":"Plugin for the MySQL JDBC driver"}]'
     artifact_name: 'mysql-connector-java'
     artifact_version: '8.0.25'
+  bigquerymultitable:
+    url: https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.25/mysql-connector-java-8.0.25.jar
+    driver_prop: '[{"name":"mysql","type":"jdbc","className":"com.mysql.jdbc.Driver","description":"Plugin for the MySQL JDBC driver"}]'
+    artifact_name: 'mysql-connector-java'
+    artifact_version: '8.0.25'
