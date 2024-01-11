@@ -125,11 +125,6 @@ public class CdfPipelineRunAction {
             ExpectedConditions.visibilityOf(CdfPipelineRunLocators.failedStatus),
             ExpectedConditions.visibilityOf(CdfPipelineRunLocators.stoppedStatus)
     ));
-
-
-    if (CdfPipelineRunLocators.runningStatus.isDisplayed()) {
-      PageHelper.refreshCurrentPage();
-    }
   }
 
   /**
