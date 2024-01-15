@@ -127,6 +127,8 @@ public class CdfPipelineRunAction {
     CdfPipelineRunAction.logsClick();
     Thread.sleep(5000);
     CdfLogActions.closeLogs();
+    PageHelper.refreshCurrentPage();
+
     SeleniumDriver.getWaitDriver(ConstantsUtil.PIPELINE_RUN_TIMEOUT_SECONDS).until(ExpectedConditions.or(
             ExpectedConditions.visibilityOf(CdfPipelineRunLocators.succeededStatus),
             ExpectedConditions.visibilityOf(CdfPipelineRunLocators.failedStatus),
