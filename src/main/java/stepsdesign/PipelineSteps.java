@@ -392,7 +392,7 @@ public class PipelineSteps implements CdfHelper {
   }
 
   @Then("Wait till pipeline is in running status with a timeout of {long} seconds")
-  public void waitTillPipelineIsInRunningState(long timeoutInSeconds) {
+  public void waitTillPipelineIsInRunningState(long timeoutInSeconds) throws InterruptedException {
     CdfPipelineRunAction.waitTillPipelineRunCompletes(timeoutInSeconds);
   }
 

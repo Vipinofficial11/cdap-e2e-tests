@@ -27,8 +27,11 @@ import io.cdap.e2e.utils.SeleniumHelper;
 import io.cdap.e2e.utils.WaitHelper;
 import org.junit.Assert;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,6 +42,7 @@ import java.io.PrintWriter;
  * Represents Cdf Pipeline Run Page Actions
  */
 public class CdfPipelineRunAction {
+  private static final Logger logger = LoggerFactory.getLogger(CdfPipelineRunAction.class);
 
   static {
     SeleniumHelper.getPropertiesLocators(CdfPipelineRunLocators.class);
@@ -120,6 +124,9 @@ public class CdfPipelineRunAction {
    * Timeout: {@link ConstantsUtil#IMPLICIT_TIMEOUT_SECONDS}
    */
   public static void waitTillPipelineRunCompletes() throws InterruptedException {
+    CdfPipelineRunAction.logsClick();
+    Thread.sleep(5000);
+    CdfLogActions.closeLogs();
     SeleniumDriver.getWaitDriver(ConstantsUtil.PIPELINE_RUN_TIMEOUT_SECONDS).until(ExpectedConditions.or(
             ExpectedConditions.visibilityOf(CdfPipelineRunLocators.succeededStatus),
             ExpectedConditions.visibilityOf(CdfPipelineRunLocators.failedStatus),
@@ -133,13 +140,46 @@ public class CdfPipelineRunAction {
    *
    * @param timeoutInSeconds timeout
    */
-  public static void waitTillPipelineRunCompletes(long timeoutInSeconds) {
+  public static void waitTillPipelineRunCompletes(long timeoutInSeconds) throws InterruptedException {
+    CdfPipelineRunAction.logsClick();
+    Thread.sleep(5000);
+    CdfLogActions.closeLogs();
     SeleniumDriver.getWaitDriver(timeoutInSeconds).until(ExpectedConditions.or(
       ExpectedConditions.visibilityOf(CdfPipelineRunLocators.succeededStatus),
       ExpectedConditions.visibilityOf(CdfPipelineRunLocators.failedStatus),
       ExpectedConditions.visibilityOf(CdfPipelineRunLocators.stoppedStatus)
     ));
   }
+
+
+  public static void waitTillPipelineRunCompletes2() throws Exception {
+    long startTime = System.currentTimeMillis();
+    logger.info("START Time : ", startTime);
+    long timeoutInMillis = ConstantsUtil.PIPELINE_RUN_TIMEOUT_SECONDS * 1000;
+    logger.info("Pipeline max time converted to milliseconds : ", timeoutInMillis);
+
+    while (System.currentTimeMillis() - startTime < timeoutInMillis) {
+      try {
+        SeleniumDriver.getWaitDriver(40).until(ExpectedConditions.or(
+                ExpectedConditions.visibilityOf(CdfPipelineRunLocators.succeededStatus),
+                ExpectedConditions.visibilityOf(CdfPipelineRunLocators.failedStatus),
+                ExpectedConditions.visibilityOf(CdfPipelineRunLocators.stoppedStatus)
+        ));
+
+        if (CdfPipelineRunLocators.runningStatus.isDisplayed()) {
+          PageHelper.refreshCurrentPage();
+        } else {
+          // Break out of the loop if the running status is not displayed
+          break;
+        }
+      } catch (TimeoutException e) {
+        // The expected conditions were not met, continue the loop
+        logger.warn("TimeoutException caught: {}", e.getMessage());
+      }
+    }
+  }
+
+
   /**
    * Stop the Pipeline
    */
