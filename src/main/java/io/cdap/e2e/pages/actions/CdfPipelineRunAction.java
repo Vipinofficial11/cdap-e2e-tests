@@ -125,9 +125,9 @@ public class CdfPipelineRunAction {
    */
   public static void waitTillPipelineRunCompletes() throws InterruptedException {
     CdfPipelineRunAction.logsClick();
-    Thread.sleep(5000);
+    Thread.sleep(2000);
     CdfLogActions.closeLogs();
-    PageHelper.refreshCurrentPage();
+//    PageHelper.refreshCurrentPage();
 
     SeleniumDriver.getWaitDriver(ConstantsUtil.PIPELINE_RUN_TIMEOUT_SECONDS).until(ExpectedConditions.or(
             ExpectedConditions.visibilityOf(CdfPipelineRunLocators.succeededStatus),
@@ -144,7 +144,7 @@ public class CdfPipelineRunAction {
    */
   public static void waitTillPipelineRunCompletes(long timeoutInSeconds) throws InterruptedException {
     CdfPipelineRunAction.logsClick();
-    Thread.sleep(5000);
+    Thread.sleep(2000);
     CdfLogActions.closeLogs();
     SeleniumDriver.getWaitDriver(timeoutInSeconds).until(ExpectedConditions.or(
       ExpectedConditions.visibilityOf(CdfPipelineRunLocators.succeededStatus),
