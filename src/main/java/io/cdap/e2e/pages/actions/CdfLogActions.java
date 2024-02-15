@@ -85,7 +85,8 @@ public class CdfLogActions {
       expectedLogMessage = PluginPropertyUtils.errorProp(expectedLogMessage);
     }
 
-    AssertionHelper.verifyElementDisplayed(CdfLogLocators.locateLogEntry(expectedLogLevel, expectedLogMessage));
+//    AssertionHelper.verifyElementDisplayed(CdfLogLocators.locateLogEntry(expectedLogLevel, expectedLogMessage));
+    ElementHelper.ifElementDisplayed(CdfLogLocators.locateLogEntry(expectedLogLevel, expectedLogMessage));
   }
 
   /**

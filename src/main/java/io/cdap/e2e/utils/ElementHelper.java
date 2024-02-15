@@ -295,6 +295,15 @@ public class ElementHelper {
     }
   }
 
+  public static boolean ifElementDisplayed(WebElement element) {
+    if (!element.isDisplayed()) {
+      scrollToElementUsingJsExecutor(element);
+      return element.isDisplayed();
+    } else {
+      return true;
+    }
+  }
+
   /**
    * Check if a WebElement gets displayed with a timeout
    *
