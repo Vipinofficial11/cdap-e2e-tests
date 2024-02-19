@@ -297,7 +297,7 @@ public class ElementHelper {
 
   public static boolean ifElementDisplayed(WebElement element) {
     if (!element.isDisplayed()) {
-      scrollToElementUsingJsExecutor(element);
+      js.executeScript("window.scrollTo(0, 0);", element);
       return element.isDisplayed();
     } else {
       return true;
